@@ -6,23 +6,23 @@ if(!isset($_SESSION["username"])){
 
 include "../connection.php";
 $msg="";
-$top_category_id="";
-$top_category_name="";
-$top_category_order="";
+$category_id="";
+$category_name="";
+$category_order="";
 if(isset($_GET["edit_id"])){
 	$qe = mysqli_query($con, "select * from table_top_category where top_category_id='".mres($con,$_GET["edit_id"])."'");
 	while($row=mysqli_fetch_array($qe)){
-		$top_category_id=$row["top_category_id"];
-		$top_category_name=$row["top_category_name"];
-		$top_category_order=$row["top_category_order"];
+		$category_id=$row["category_id"];
+		$category_name=$row["category_name"];
+		$category_order=$row["category_order"];
 	}
 }
 
 
 if(isset($_POST["btn_save"])){
-$text_top_category_name=mres($con,$_POST["text_top_category_name"]);
-$text_top_category_order=mres($con,$_POST["text_top_category_order"]);
-$qry=mysqli_query($con, "insert into table_top_category values('','".$text_top_category_name."','".$text_top_category_order."')");
+$text_category_name=mres($con,$_POST["text_category_name"]);
+$text_category_order=mres($con,$_POST["text_category_order"]);
+$qry=mysqli_query($con, "insert into table_category values('','".$text_category_name."','".$text_category_order."')");
 if($qry){
 	$msg='
 		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is inserted</div>
@@ -66,20 +66,38 @@ include "header.php";
 			<div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
 				<div class="panel panel-info">
 					<div class="panel-heading">
-						<div class="panel-title">Add New Top Category</div>
+						<div class="panel-title">Add New Category</div>
 					</div>
 						<div class="panel-body">
 							<?php echo $msg;?>
-							<form id="form_add_top_category" class="form-horizontal" role="form" method="post" action='<?php echo $_SERVER["PHP_SELF"];?>'>
-							<input type="hidden" name="top_category_id" value="<?php echo $top_category_id;?>">
+							<form id="form_add_category" class="form-horizontal" role="form" method="post" action='<?php echo $_SERVER["PHP_SELF"];?>'>
+							<input type="hidden" name="category_id" value="<?php echo $category_id;?>">
 							<div style="margin-bottom: 25px" class="input-group">
                                     <span class="input-group-addon">Top Category Name</span>
-                                    <input type="text" class="form-control" name="text_top_category_name" id="text_top_category_name" value="<?php echo $top_category_name;?>">                                    
+                                    <input type="text" class="form-control" name="text_category_name" id="text_category_name" value="<?php echo $category_name;?>">                                    
                             </div>
 							<div style="margin-bottom: 25px" class="input-group">
-                                    <span class="input-group-addon">Top Category Order</span>
-                                    <input type="text" class="form-control" name="text_top_category_order" id="text_top_category_order" value="<?php echo $top_category_order;?>">                                    
+                                    <span class="input-group-addon">Category Order</span>
+                                    <input type="text" class="form-control" name="text_category_order" id="text_category_order" value="<?php echo $category_order;?>">                                    
                             </div>
+                            <div style="margin-bottom: 25px" class="input-group">
+                            <span class="input-group-addon">Top Category</span>
+							<select name="top_category_id" class="form-control" id="top_category_id">
+							<option value=''>--Choose a Top Category --</option>
+
+							<?php 
+							$qtc=mysqli_query($con,"select * from table_top_category order by top_category_order desc");
+							while($row=mysqli_fetch_array($qtc)){
+								echo '<option value="'.$row["top_category_id"].'">'.$row["top_category_name"].'</option>';
+							}
+							?>
+
+							</select></div>
+
+
+                            </div>
+
+
                                 <div style="margin-top:10px" class="form-group">
                                 	<div class="col-sm-12 controls">
                                 		<?php if(!isset($_GET["edit_id"])){
@@ -111,14 +129,19 @@ include "header.php";
 			});
 
 	  $("#btn_save").click(function(e){
-	 	if($('#text_top_category_name').val()==''){
-	 		$('#text_top_category_name').css("border-color", "#DA190B");
-	 		$('#text_top_category_name').css("background", "#F2DEDE");
+	 	if($('#text_category_name').val()==''){
+	 		$('#text_category_name').css("border-color", "#DA190B");
+	 		$('#text_category_name').css("background", "#F2DEDE");
 	 		e.preventDefault();
 	 	}
-	 	if($('#text_top_category_order').val()==''){
-	 		$('#text_top_category_order').css("border-color", "#DA190B");
-	 		$('#text_top_category_order').css("background", "#F2DEDE");
+	 	if($('#text_category_order').val()==''){
+	 		$('#text_category_order').css("border-color", "#DA190B");
+	 		$('#text_category_order').css("background", "#F2DEDE");
+	 		e.preventDefault();
+	 	}
+	 	if($('#top_category_id').val()==''){
+	 		$('#top_category_id').css("border-color", "#DA190B");
+	 		$('#top_category_id').css("background", "#F2DEDE");
 	 		e.preventDefault();
 	 	}
 	 	else{
