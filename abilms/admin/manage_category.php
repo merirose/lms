@@ -9,7 +9,7 @@ $msg="";
 if(isset($_GET["delete_id"])){
 // $text_top_category_name=mres($con,$_POST["text_top_category_name"]);
 // $text_top_category_order=mres($con,$_POST["text_top_category_order"]);
-$qry=mysqli_query($con, "delete from table_top_category where top_category_id='".mres($con,$_GET["delete_id"])."'");
+$qry=mysqli_query($con, "delete from table_category where category_id='".mres($con,$_GET["delete_id"])."'");
 if($qry){
 	$msg='
 		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is deleted</div>
@@ -52,8 +52,9 @@ include "header.php";
 			    <thead>
 			      <tr>
 			        <th>#</th>
-			        <th>Top Category</th>
-			        <th>Top Category Order</th>
+			        <th>Category Name</th>
+			        <th>Category Order</th>
+			        <th>Top Category Name</th>
 			        <th>Action</th>
 			      </tr>
 			    </thead>
@@ -61,18 +62,21 @@ include "header.php";
 			    	<?php
 			    	$qry="";
 			    	if(isset($_POST["btn_search"])){
-			    		$qry=mysqli_query($con,"select * from table_top_category where top_category_name like '%".mres($con,$_POST["search_text"])."%' order by top_category_order asc");
+			    		$qry=mysqli_query($con,"select * from table_category
+			    		inner join table_top_category on table_category.top_category_id = table_top_category.top_category_id
+			    		where category_name like '%".mres($con,$_POST["search_text"])."%'
+						order by category_order asc");
 
 			    	}
 
 			    	else {
-			    		$qry=mysqli_query($con,"select * from table_top_category order by top_category_order asc");		
+			    		$qry=mysqli_query($con,"select * from table_category inner join table_top_category on table_category.top_category_id = table_top_category.top_category_id order by category_order asc");		
 			    	}
 			    	while($row=mysqli_fetch_array($qry)) {
 			    		echo '<tr>';
-			    		echo '<td>'.$row["top_category_id"]."</td><td>".$row["top_category_name"].
-			    		"</td><td>".$row["top_category_order"]."</td><td>
-			    		<a href='add_top_category.php?edit_id=".$row["top_category_id"]."'> Edit </a>| <a href='?delete_id=".$row["top_category_id"]."' onclick=\"return confirm('Are you sure you want to delete this item?');\">Delete</a></td>";
+			    		echo '<td>'.$row["category_id"]."</td><td>".$row["category_name"].
+			    		"</td><td>".$row["category_order"]."</td><td>".$row["top_category_name"]."</td><td>
+			    		<a href='add_category.php?edit_id=".$row["category_id"]."'> Edit </a>| <a href='?delete_id=".$row["category_id"]."' onclick=\"return confirm('Are you sure you want to delete this item?');\">Delete</a></td>";
 			    		echo '</tr>';
 			    	}
 			    	?>

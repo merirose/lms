@@ -9,20 +9,24 @@ $msg="";
 $category_id="";
 $category_name="";
 $category_order="";
+$top_category_id="";
 if(isset($_GET["edit_id"])){
-	$qe = mysqli_query($con, "select * from table_top_category where top_category_id='".mres($con,$_GET["edit_id"])."'");
+
+	$qe = mysqli_query($con, "select * from table_category where category_id='".mres($con,$_GET["edit_id"])."'");
 	while($row=mysqli_fetch_array($qe)){
 		$category_id=$row["category_id"];
 		$category_name=$row["category_name"];
 		$category_order=$row["category_order"];
+		$top_category_id=$row["top_category_id"];
 	}
 }
 
 
 if(isset($_POST["btn_save"])){
-$text_category_name=mres($con,$_POST["text_category_name"]);
-$text_category_order=mres($con,$_POST["text_category_order"]);
-$qry=mysqli_query($con, "insert into table_category values('','".$text_category_name."','".$text_category_order."')");
+	$text_category_name=mres($con,$_POST["text_category_name"]);
+	$text_category_order=mres($con,$_POST["text_category_order"]);
+	$top_category_id=mres($con,$_POST["top_category_id"]);
+$qry=mysqli_query($con, "insert into table_category values('','".$text_category_name."','".$text_category_order."','".$top_category_id."')");
 if($qry){
 	$msg='
 		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is inserted</div>
@@ -36,19 +40,21 @@ else {
 }
 
 if(isset($_POST["btn_edit"])){
-$text_top_category_name=mres($con,$_POST["text_top_category_name"]);
-$text_top_category_order=mres($con,$_POST["text_top_category_order"]);
+$category_id=mres($con,$_POST["text_category_id"]);
+$category_name=mres($con,$_POST["text_category_name"]);
+$category_order=mres($con,$_POST["text_category_order"]);
 $top_category_id=mres($con,$_POST["top_category_id"]);
-$qry=mysqli_query($con,"update table_top_category set top_category_name='".$text_top_category_name."', top_category_order='".$text_top_category_order."' where top_category_id='".$top_category_id."'");
+$qry=mysqli_query($con,"update table_category set category_name='".$category_name."', category_order='".$category_order."',top_category_id='".$top_category_id."' where category_id='".$category_id."'");
 
 if($qry){
+	header("location: manage_category.php");
 	$msg='
-		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is inserted</div>
+		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is edited</div>
 	';
 }
 else {
 	$msg='
-		<div id="login-alert" class="alert alert-danger col-sm-12">Fail! Cannot insert data to Database</div>
+		<div id="login-alert" class="alert alert-danger col-sm-12">Fail! Cannot edit data to Database</div>
 	';
 }
 }
@@ -71,31 +77,31 @@ include "header.php";
 						<div class="panel-body">
 							<?php echo $msg;?>
 							<form id="form_add_category" class="form-horizontal" role="form" method="post" action='<?php echo $_SERVER["PHP_SELF"];?>'>
-							<input type="hidden" name="category_id" value="<?php echo $category_id;?>">
+							<input type="hidden" name="text_category_id" value="<?php echo $category_id;?>">
 							<div style="margin-bottom: 25px" class="input-group">
                                     <span class="input-group-addon">Top Category Name</span>
                                     <input type="text" class="form-control" name="text_category_name" id="text_category_name" value="<?php echo $category_name;?>">                                    
                             </div>
 							<div style="margin-bottom: 25px" class="input-group">
-                                    <span class="input-group-addon">Category Order</span>
-                                    <input type="text" class="form-control" name="text_category_order" id="text_category_order" value="<?php echo $category_order;?>">                                    
-                            </div>
-                            <div style="margin-bottom: 25px" class="input-group">
-                            <span class="input-group-addon">Top Category</span>
-							<select name="top_category_id" class="form-control" id="top_category_id">
-							<option value=''>--Choose a Top Category --</option>
+                                    <span class="input-group-addon">Top Category Order</span>
+                                    <input type="text" class="form-control" name="text_category_order" id="text_category_order" value="<?php echo $category_order;?>">
+                                </div>
 
-							<?php 
-							$qtc=mysqli_query($con,"select * from table_top_category order by top_category_order desc");
-							while($row=mysqli_fetch_array($qtc)){
-								echo '<option value="'.$row["top_category_id"].'">'.$row["top_category_name"].'</option>';
-							}
-							?>
+                                <div style="margin-bottom: 25px;" class="input-group">
+                                	<span class="input-group-addon">Top Category</span>
+                                	<select name="top_category_id" class="form-control" id="top_category_id">
+                                		<option value=''>-- Choose a category --</option>
+                                	<?php
+                                	$qtc=mysqli_query($con,"select * from table_top_category order by top_category_order desc");
+                                	while ($row=mysqli_fetch_array($qtc)) {
+                                		if($row["top_category_id"]==$top_category_id)
+                                		echo '<option value="'.$row["top_category_id"].'" selected>'.$row["top_category_name"].'</option>';
+                                		else
+                                		echo '<option value="'.$row["top_category_id"].'">'.$row["top_category_name"].'</option>';
+                                	}
 
-							</select></div>
-
-
-                            </div>
+                                	?>
+                                	</select></div>
 
 
                                 <div style="margin-top:10px" class="form-group">
@@ -128,7 +134,7 @@ include "header.php";
 			$(this).removeAttr('style');
 			});
 
-	  $("#btn_save").click(function(e){
+	  $("#btn_save,#btn_edit").click(function(e){
 	 	if($('#text_category_name').val()==''){
 	 		$('#text_category_name').css("border-color", "#DA190B");
 	 		$('#text_category_name').css("background", "#F2DEDE");
@@ -148,18 +154,6 @@ include "header.php";
 	 		$('form_add_top_category').unbind('submit').submit();
 	 	}
 	  });
-
-	  // $("#btn_password").click(function(e){
-	 	// if($('#password').val()==''){
-	 	// 	$('#password').css("border-color", "#DA190B");
-	 	// 	$('#password').css("background", "#F2DEDE");
-	 	// 	e.preventDefault();
-	 	// }
-	 	// else{
-	 	// 	$('form_password').unbind('submit').submit();
-	 	// }
-	  // });
-
 	});
 </script>
 <?php include "footer.php"; ?>

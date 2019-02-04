@@ -42,13 +42,14 @@ $top_category_id=mres($con,$_POST["top_category_id"]);
 $qry=mysqli_query($con,"update table_top_category set top_category_name='".$text_top_category_name."', top_category_order='".$text_top_category_order."' where top_category_id='".$top_category_id."'");
 
 if($qry){
+	header("location: manage_top_category.php");
 	$msg='
 		<div id="login-alert" class="alert alert-success col-sm-12">Success! Data is inserted</div>
 	';
 }
 else {
 	$msg='
-		<div id="login-alert" class="alert alert-danger col-sm-12">Fail! Cannot insert data to Database</div>
+		<div id="login-alert" class="alert alert-danger col-sm-12">Fail! Cannot edit data to Database</div>
 	';
 }
 }
@@ -110,7 +111,7 @@ include "header.php";
 			$(this).removeAttr('style');
 			});
 
-	  $("#btn_save").click(function(e){
+	  $("#btn_save,#btn_edit").click(function(e){
 	 	if($('#text_top_category_name').val()==''){
 	 		$('#text_top_category_name').css("border-color", "#DA190B");
 	 		$('#text_top_category_name').css("background", "#F2DEDE");
